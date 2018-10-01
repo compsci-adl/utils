@@ -1,7 +1,7 @@
 '''
-INSTRUCTIONS FOR USE: 
-Export the response file from Google Sheets. Call it nominations.csv, and save it to the same location as this script. 
-In the same folder, create a directory `output'. Download the images from the Google Drive folder and extract them into `output'. 
+INSTRUCTIONS FOR USE:
+Export the response file from Google Sheets. Call it nominations.csv, and save it to the same location as this script.
+In the same folder, create a directory `output'. Download the images from the Google Drive folder and extract them into `output'.
 Run this script.
 Open `output/all.html`. Copy each block into the appropriate area in `nominations/index.html'.
 Copy the remaining files into `nominations/'
@@ -10,20 +10,33 @@ Copy the remaining files into `nominations/'
 import csv
 
 CARD_TEMPLATE = """<div class="col s12 m3">
-  <div class="card">
-    <div class="card-image">
-      <img src="{0}.jpg">
-      <span class="card-title">{1}</span>
+<div class="card">
+	<div class="card-image">
+    	<img src="{0}.jpg">
     </div>
     <div class="card-content">
-      <p>{2}</p>
-      </div>
-      <div class="card-action">
-        <a href="{0}.html">Read my profile</a>
-      </div>
-    </div>              
-  </div>
+		<span class="card-title">{1}</span>
+      	<p class="truncate">{2}</p>
+	</div>
+	<div class="card-action">
+		<a href="{0}.html">Read my profile</a>
+	</div>
+</div>
+</div>
 """
+
+# <div class="card">
+# 	<div class="card-image">
+# 		<img src="Daniel.jpg">
+# 	</div>
+# 	<div class="card-content">
+# 		<span class="card-title">Daniel Ng</span>
+# 		<p class="truncate">First year computer science ("advanced") </p>
+# 	</div>
+# 	<div class="card-action">
+# 		<a href="Daniel.html">Read my profile</a>
+# 	</div>
+# </div>
 
 PAGE_TEMPLATE = """<h2 class="cs-pink center">{0}</h2>
 <div class="col s12 m3">
@@ -36,15 +49,19 @@ PAGE_TEMPLATE = """<h2 class="cs-pink center">{0}</h2>
   <h4 class="cs-blue">Position(s)</h4>
     <ul class="dot-points">
       <li>{3}</li>
-    </ul> 
+    </ul>
 </div>
 <div class="col s12 m9">
   <h4 class="cs-blue">What will you bring to the CS Club?</h4>
   <p>{4}</p>
   <h4 class="cs-blue">Why do you want to be on the committee?</h4>
   <p>{5}</p>
-  <h4 class="cs-blue">What previous experience do you have that will help you serve the club?</h4>  
+  <h4 class="cs-blue">What previous experience do you have that will help you serve the club?</h4>
   <p>{6}</p>
+  <h4 class="cs-blue">Have you been on the CS Club committee before?</h4>
+  <p>{7}</p>
+  <h4 class="cs-blue">As a a previous committee member, how did you contribute?</h4>
+  <p>{8}</p>
 </div>"""
 
 WHOLE_PAGE_TEMPLATE = """
@@ -55,7 +72,7 @@ WHOLE_PAGE_TEMPLATE = """
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="canonical" href="https://csclub.org.au/nominations/{0}" />
-  <title>CS Club | 2018 Committee Nomination</title>
+  <title>CS Club | 2019 Committee Nomination</title>
   <!-- Materialize -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css" integrity="sha256-mDRlQYEnF3BuKJadRTD48MaEv4+tX8GVP9dEvjZRv3c=" crossorigin="anonymous" />
   <!-- General stylesheet -->
@@ -192,12 +209,14 @@ WHOLE_PAGE_TEMPLATE = """
 
 class NominationForm:
   def __init__(self, csv_row):
-    self.name = csv_row[1]
-    self.positions = csv_row[2].split(", ")
-    self.biography = csv_row[3]
-    self.question1 = csv_row[4]
-    self.question2 = csv_row[5]
-    self.question3 = csv_row[6]
+    self.name = csv_row[2]
+    self.positions = csv_row[4].split(", ")
+    self.biography = csv_row[5]
+    self.question1 = csv_row[7]
+    self.question2 = csv_row[8]
+    self.question3 = csv_row[9]
+    self.question4 = csv_row[10]
+    self.question5 = csv_row[11]
     self.url = self.name.replace(" ", "")
 
   def card(self):
@@ -205,14 +224,14 @@ class NominationForm:
 
   def page(self):
     li_positions = "</li>\n<li>".join(self.positions)
-    main = PAGE_TEMPLATE.format(self.name, self.url, self.biography, li_positions, self.question1, self.question2, self.question3)
+    main = PAGE_TEMPLATE.format(self.name, self.url, self.biography, li_positions, self.question1, self.question2, self.question3, self.question4, self.question5)
     return WHOLE_PAGE_TEMPLATE.format(self.url, main)
 
 
 with open('nominations.csv', 'rt') as csvfile:
   reader = csv.reader(csvfile)
   # Skip the header
-  next(reader) 
+  next(reader)
 
   for row in reader:
     nomination = NominationForm(row)
